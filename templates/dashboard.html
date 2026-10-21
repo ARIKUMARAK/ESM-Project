@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Enterprise Server Monitoring System</title>
+
+    <meta http-equiv="refresh" content="5">
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f4f7;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background-color: #1f2937;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 30px auto;
+        }
+
+        .server-info,
+        .card,
+        .status,
+        .chart-box {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .server-info h2,
+        .status h2,
+        .chart-box h2 {
+            margin-top: 0;
+        }
+
+        .cards {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            flex: 1;
+            min-width: 220px;
+            text-align: center;
+        }
+
+        .value {
+            font-size: 35px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .normal {
+            color: green;
+            font-weight: bold;
+        }
+
+        .warning {
+            color: orange;
+            font-weight: bold;
+        }
+
+        .chart-box {
+            margin-top: 25px;
+            overflow-x: auto;
+        }
+
+        .graph {
+            width: 100%;
+            height: 300px;
+            border: 1px solid #ddd;
+            background-color: #fafafa;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #1f2937;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .alert-row {
+            color: #d97706;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: #666;
+        }
+
+        .scheduling-intro {
+            background-color: #f8fafc;
+            border-left: 5px solid #1f2937;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .algorithm-title {
+            margin-top: 0;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- ===================================================== -->
+<!-- HEADER -->
+<!-- ===================================================== -->
+
+<div class="header">
+
+    <h1>Enterprise Server Monitoring System</h1>
+
+    <p>Server Resource Monitoring Dashboard</p>
+
+</div>
+
+
+<div class="container">
+
+
+<!-- ===================================================== -->
+<!-- SERVER INFORMATION -->
+<!-- ===================================================== -->
+
+<div class="server-info">
+
+    <h2>🖥️ Server Information</h2>
+
+    <p>
+        <strong>Server Name:</strong>
+        {{ server_name }}
+    </p>
+
+    <p>
+        <strong>Operating System:</strong>
+        {{ operating_system }}
+    </p>
+
+    <p>
+        <strong>IP Address:</strong>
+        {{ ip_address }}
+    </p>
+
+    <p>
+        <strong>Last Updated:</strong>
+        {{ data['timestamp'] }}
+    </p>
+
+    <p>
+        <strong>Server Uptime:</strong>
+        {{ uptime }}
+    </p>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- RESOURCE CARDS -->
+<!-- ===================================================== -->
+
+<div class="cards">
+
+
+    <!-- CPU -->
+
+    <div class="card">
+
+        <h2>CPU Usage</h2>
+
+        <div class="value">
+            {{ data['cpu'] }}%
+        </div>
+
+        {% if data['cpu'] > 80 %}
+
+            <div class="warning">
+                ⚠️ HIGH
+            </div>
+
+        {% else %}
+
+            <div class="normal">
+                ✅ NORMAL
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- RAM -->
+
+    <div class="card">
+
+        <h2>RAM Usage</h2>
+
+        <div class="value">
+            {{ data['ram'] }}%
+        </div>
+
+        {% if data['ram'] > 80 %}
+
+            <div class="warning">
+                ⚠️ HIGH
+            </div>
+
+        {% else %}
+
+            <div class="normal">
+                ✅ NORMAL
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- DISK -->
+
+    <div class="card">
+
+        <h2>Disk Usage</h2>
+
+        <div class="value">
+            {{ data['disk'] }}%
+        </div>
+
+        {% if data['disk'] > 85 %}
+
+            <div class="warning">
+                ⚠️ HIGH
+            </div>
+
+        {% else %}
+
+            <div class="normal">
+                ✅ NORMAL
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- NETWORK -->
+<!-- ===================================================== -->
+
+<div class="cards" style="margin-top:25px;">
+
+
+    <div class="card">
+
+        <h2>📤 Data Sent</h2>
+
+        <div class="value">
+            {{ data_sent }} MB
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>📥 Data Received</h2>
+
+        <div class="value">
+            {{ data_received }} MB
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- RESOURCE STATUS -->
+<!-- ===================================================== -->
+
+<div class="status">
+
+    <h2>📊 Resource Status</h2>
+
+
+    {% if data['cpu'] > 80 %}
+
+        <p class="warning">
+            ⚠️ High CPU usage detected.
+        </p>
+
+    {% else %}
+
+        <p class="normal">
+            ✅ CPU usage is normal.
+        </p>
+
+    {% endif %}
+
+
+    {% if data['ram'] > 80 %}
+
+        <p class="warning">
+            ⚠️ High RAM usage detected.
+        </p>
+
+    {% else %}
+
+        <p class="normal">
+            ✅ RAM usage is normal.
+        </p>
+
+    {% endif %}
+
+
+    {% if data['disk'] > 85 %}
+
+        <p class="warning">
+            ⚠️ High disk usage detected.
+        </p>
+
+    {% else %}
+
+        <p class="normal">
+            ✅ Disk usage is normal.
+        </p>
+
+    {% endif %}
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- PROCESS MONITORING -->
+<!-- ===================================================== -->
+
+<div class="chart-box">
+
+    <h2>⚙️ Process Monitoring</h2>
+
+    <p>
+        Currently running processes on the server:
+    </p>
+
+    {% if processes %}
+
+    <table>
+
+        <tr>
+
+            <th>PID</th>
+            <th>Process Name</th>
+            <th>Status</th>
+            <th>CPU %</th>
+            <th>Memory %</th>
+
+        </tr>
+
+
+        {% for process in processes %}
+
+        <tr>
+
+            <td>
+                {{ process['pid'] }}
+            </td>
+
+            <td>
+                {{ process['name'] }}
+            </td>
+
+            <td>
+                {{ process['status'] }}
+            </td>
+
+            <td>
+                {{ "%.1f"|format(process['cpu']) }}%
+            </td>
+
+            <td>
+                {{ "%.2f"|format(process['memory']) }}%
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+    {% else %}
+
+        <p>
+            No process information available.
+        </p>
+
+    {% endif %}
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- ALERT HISTORY -->
+<!-- ===================================================== -->
+
+<div class="status">
+
+    <h2>🚨 Alert History</h2>
+
+
+    {% if alerts %}
+
+    <table>
+
+        <tr>
+
+            <th>Time</th>
+
+            <th>Resource</th>
+
+            <th>Usage</th>
+
+            <th>Message</th>
+
+        </tr>
+
+
+        {% for alert in alerts %}
+
+        <tr class="alert-row">
+
+            <td>
+                {{ alert['timestamp'] }}
+            </td>
+
+            <td>
+                {{ alert['resource'] }}
+            </td>
+
+            <td>
+                {{ alert['usage'] }}%
+            </td>
+
+            <td>
+                ⚠️ {{ alert['message'] }}
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+
+    </table>
+
+
+    {% else %}
+
+        <p class="normal">
+            ✅ No alerts recorded.
+        </p>
+
+    {% endif %}
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- CPU GRAPH -->
+<!-- ===================================================== -->
+
+<div class="chart-box">
+
+    <h2>📈 CPU Usage History</h2>
+
+    <svg class="graph"
+         viewBox="0 0 1000 300"
+         preserveAspectRatio="none">
+
+        <line x1="0" y1="75"
+              x2="1000" y2="75"
+              stroke="#ddd"/>
+
+        <line x1="0" y1="150"
+              x2="1000" y2="150"
+              stroke="#ddd"/>
+
+        <line x1="0" y1="225"
+              x2="1000" y2="225"
+              stroke="#ddd"/>
+
+
+        <polyline
+
+            points="
+
+            {% set count = history|length %}
+
+            {% for row in history %}
+
+                {% if count > 1 %}
+
+                    {{ loop.index0 * 1000 / (count - 1) }},
+                    {{ 300 - (row['cpu'] * 3) }}
+
+                {% else %}
+
+                    0,
+                    {{ 300 - (row['cpu'] * 3) }}
+
+                {% endif %}
+
+            {% endfor %}
+
+            "
+
+            fill="none"
+
+            stroke="blue"
+
+            stroke-width="4"
+
+        />
+
+    </svg>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- RAM GRAPH -->
+<!-- ===================================================== -->
+
+<div class="chart-box">
+
+    <h2>📈 RAM Usage History</h2>
+
+    <svg class="graph"
+         viewBox="0 0 1000 300"
+         preserveAspectRatio="none">
+
+        <line x1="0" y1="75"
+              x2="1000" y2="75"
+              stroke="#ddd"/>
+
+        <line x1="0" y1="150"
+              x2="1000" y2="150"
+              stroke="#ddd"/>
+
+        <line x1="0" y1="225"
+              x2="1000" y2="225"
+              stroke="#ddd"/>
+
+
+        <polyline
+
+            points="
+
+            {% set count = history|length %}
+
+            {% for row in history %}
+
+                {% if count > 1 %}
+
+                    {{ loop.index0 * 1000 / (count - 1) }},
+                    {{ 300 - (row['ram'] * 3) }}
+
+                {% else %}
+
+                    0,
+                    {{ 300 - (row['ram'] * 3) }}
+
+                {% endif %}
+
+            {% endfor %}
+
+            "
+
+            fill="none"
+
+            stroke="red"
+
+            stroke-width="4"
+
+        />
+
+    </svg>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- DISK GRAPH -->
+<!-- ===================================================== -->
+
+<div class="chart-box">
+
+    <h2>📈 Disk Usage History</h2>
+
+    <svg class="graph"
+         viewBox="0 0 1000 300"
+         preserveAspectRatio="none">
+
+        <line x1="0" y1="75"
+              x2="1000" y2="75"
+              stroke="#ddd"/>
+
+        <line x1="0" y1="150"
+              x2="1000" y2="150"
+              stroke="#ddd"/>
+
+        <line x1="0" y1="225"
+              x2="1000" y2="225"
+              stroke="#ddd"/>
+
+
+        <polyline
+
+            points="
+
+            {% set count = history|length %}
+
+            {% for row in history %}
+
+                {% if count > 1 %}
+
+                    {{ loop.index0 * 1000 / (count - 1) }},
+                    {{ 300 - (row['disk'] * 3) }}
+
+                {% else %}
+
+                    0,
+                    {{ 300 - (row['disk'] * 3) }}
+
+                {% endif %}
+
+            {% endfor %}
+
+            "
+
+            fill="none"
+
+            stroke="green"
+
+            stroke-width="4"
+
+        />
+
+    </svg>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- CPU SCHEDULING INTRODUCTION -->
+<!-- ===================================================== -->
+
+<div class="status">
+
+    <h2>⚙️ CPU Scheduling</h2>
+
+    <div class="scheduling-intro">
+
+        <p>
+            CPU Scheduling determines the order in which
+            processes are allocated CPU time.
+        </p>
+
+        <p>
+            The system demonstrates different Operating System
+            scheduling algorithms and calculates waiting time,
+            turnaround time, and execution order.
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- FCFS -->
+<!-- ===================================================== -->
+
+<div class="chart-box">
+
+    <h2 class="algorithm-title">
+        FCFS - First Come First Serve
+    </h2>
+
+    <p>
+        Processes are executed in the order in which they arrive.
+    </p>
+
+
+    <table>
+
+        <tr>
+
+            <th>PID</th>
+            <th>Process</th>
+            <th>Burst Time</th>
+            <th>Waiting Time</th>
+            <th>Turnaround Time</th>
+
+        </tr>
+
+
+        {% for process in fcfs_results %}
+
+        <tr>
+
+            <td>
+                {{ process['pid'] }}
+            </td>
+
+            <td>
+                {{ process['name'] }}
+            </td>
+
+            <td>
+                {{ process['burst'] }}
+            </td>
+
+            <td>
+                {{ process['waiting'] }}
+            </td>
+
+            <td>
+                {{ process['turnaround'] }}
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+
+    <p>
+        <strong>Average Waiting Time:</strong>
+        {{ "%.2f"|format(fcfs_wait) }}
+    </p>
+
+    <p>
+        <strong>Average Turnaround Time:</strong>
+        {{ "%.2f"|format(fcfs_turn) }}
+    </p>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- SJF -->
+<!-- ===================================================== -->
+
+<div class="chart-box">
+
+    <h2 class="algorithm-title">
+        SJF - Shortest Job First
+    </h2>
+
+    <p>
+        The process with the shortest burst time is selected first.
+    </p>
+
+
+    <table>
+
+        <tr>
+
+            <th>PID</th>
+            <th>Process</th>
+            <th>Burst Time</th>
+            <th>Waiting Time</th>
+            <th>Turnaround Time</th>
+
+        </tr>
+
+
+        {% for process in sjf_results %}
+
+        <tr>
+
+            <td>
+                {{ process['pid'] }}
+            </td>
+
+            <td>
+                {{ process['name'] }}
+            </td>
+
+            <td>
+                {{ process['burst'] }}
+            </td>
+
+            <td>
+                {{ process['waiting'] }}
+            </td>
+
+            <td>
+                {{ process['turnaround'] }}
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+
+    <p>
+        <strong>Average Waiting Time:</strong>
+        {{ "%.2f"|format(sjf_wait) }}
+    </p>
+
+    <p>
+        <strong>Average Turnaround Time:</strong>
+        {{ "%.2f"|format(sjf_turn) }}
+    </p>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- PRIORITY -->
+<!-- ===================================================== -->
+
+<div class="chart-box">
+
+    <h2 class="algorithm-title">
+        Priority Scheduling
+    </h2>
+
+    <p>
+        The process with the highest priority is selected first.
+        A smaller priority number represents higher priority.
+    </p>
+
+
+    <table>
+
+        <tr>
+
+            <th>PID</th>
+            <th>Process</th>
+            <th>Burst Time</th>
+            <th>Priority</th>
+            <th>Waiting Time</th>
+            <th>Turnaround Time</th>
+
+        </tr>
+
+
+        {% for process in priority_results %}
+
+        <tr>
+
+            <td>
+                {{ process['pid'] }}
+            </td>
+
+            <td>
+                {{ process['name'] }}
+            </td>
+
+            <td>
+                {{ process['burst'] }}
+            </td>
+
+            <td>
+                {{ process['priority'] }}
+            </td>
+
+            <td>
+                {{ process['waiting'] }}
+            </td>
+
+            <td>
+                {{ process['turnaround'] }}
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+
+    <p>
+        <strong>Average Waiting Time:</strong>
+        {{ "%.2f"|format(priority_wait) }}
+    </p>
+
+    <p>
+        <strong>Average Turnaround Time:</strong>
+        {{ "%.2f"|format(priority_turn) }}
+    </p>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- ROUND ROBIN -->
+<!-- ===================================================== -->
+
+<div class="chart-box">
+
+    <h2 class="algorithm-title">
+        Round Robin Scheduling
+    </h2>
+
+    <p>
+        Each process receives a fixed amount of CPU time
+        called a time quantum.
+    </p>
+
+
+    <p>
+
+        <strong>Time Quantum:</strong>
+        2
+
+    </p>
+
+
+    <p>
+
+        <strong>Execution Order:</strong>
+
+        {% for pid in rr_execution %}
+
+            {{ pid }}
+
+            {% if not loop.last %}
+                → 
+            {% endif %}
+
+        {% endfor %}
+
+    </p>
+
+
+    <table>
+
+        <tr>
+
+            <th>PID</th>
+            <th>Process</th>
+            <th>Burst Time</th>
+            <th>Waiting Time</th>
+            <th>Turnaround Time</th>
+
+        </tr>
+
+
+        {% for process in rr_results %}
+
+        <tr>
+
+            <td>
+                {{ process['pid'] }}
+            </td>
+
+            <td>
+                {{ process['name'] }}
+            </td>
+
+            <td>
+                {{ process['burst'] }}
+            </td>
+
+            <td>
+                {{ process['waiting'] }}
+            </td>
+
+            <td>
+                {{ process['turnaround'] }}
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+
+    <p>
+        <strong>Average Waiting Time:</strong>
+        {{ "%.2f"|format(rr_wait) }}
+    </p>
+
+    <p>
+        <strong>Average Turnaround Time:</strong>
+        {{ "%.2f"|format(rr_turn) }}
+    </p>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- FOOTER -->
+<!-- ===================================================== -->
+
+<div class="footer">
+
+    Enterprise Server Administration & Resource Monitoring System
+
+</div>
+
+
+</div>
+
+
+</body>
+
+</html>
